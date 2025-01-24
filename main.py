@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer
 from src.preprocessing import normalize_text
 from src.indexation import split_into_passages, encode_passages, build_faiss_index
 from src.training import prepare_data_for_training, fine_tune_model
+from src.pipeline import pipeline
 
 def load_text(file_path):
     """
@@ -73,6 +74,13 @@ def main():
     )
 
     print("Fine-tuning complete. Model saved in 'models/fine_tuned_t5'.")
+
+    question = "What are the main themes mentioned in the speech?"
+    faiss_index_path = "faiss_index_official.bin"
+    passages_path = "passages_official.npy"
+    
+    response = pipeline(question, faiss_index_path, passages_path)
+    print("Generated answer:", response)
 
 if __name__ == "__main__":
     main()
