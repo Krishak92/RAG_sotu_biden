@@ -2,10 +2,12 @@ import faiss
 import numpy as np
 import re
 from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Trainer, TrainingArguments
 from src.preprocessing import normalize_text
 from src.indexation import split_into_passages, encode_passages, build_faiss_index
 from src.training import prepare_data_for_training, fine_tune_model
 from src.pipeline import pipeline
+from src.test import test_pipeline
 
 def load_text(file_path):
     """
@@ -81,6 +83,21 @@ def main():
     
     response = pipeline(question, faiss_index_path, passages_path)
     print("Generated answer:", response)
+
+    query = "What are the main topics on education in the speech? "
+    model_name = "t5-small"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    sentence_encoder = SentenceTransformer("all-MiniLM-L6-v2")
+    test_pipeline(
+        faiss_index=index_official,          #index FAISS contenant les passages encodés
+        passages=passages_official,          #liste des passages correspondants
+        encoder_model=sentence_encoder,      #modèle SentenceTransformer utilisé pour l'encodage
+        generative_model=model,           #modèle génératif (T5 ou autre)
+        tokenizer=tokenizer,              #tokenizer correspondant au modèle génératif
+        query=query,                         #question à poser
+        top_k=5                              #nombre de passages à récupérer
+    )
 
 if __name__ == "__main__":
     main()
