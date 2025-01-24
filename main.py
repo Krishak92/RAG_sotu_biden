@@ -84,7 +84,7 @@ def main():
     response = pipeline(question, faiss_index_path, passages_path)
     print("Generated answer:", response)
 
-    query = "What are the main topics on education in the speech? "
+    query = "What are the main topics about education in the speech?"
     model_name = "t5-small"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
